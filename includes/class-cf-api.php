@@ -157,7 +157,7 @@ class CF_Analytics_API {
                 continue;
             }
 
-            $rum_res = wp_remote_get(self::REST_ENDPOINT . "/accounts/{$acc_id}/rum/site_info/list", [
+            $rum_res = wp_remote_get(self::REST_ENDPOINT . "/accounts/{$acc_id}/rum/site_info/list?per_page=100", [
                 'timeout' => 15,
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
@@ -176,17 +176,17 @@ class CF_Analytics_API {
             }
 
             foreach ($rum_body['result'] as $site) {
-                $site_host       = strtolower($site['host'] ?? '');
-                $clean_site_host = preg_replace('/^www\./i', '', $site_host);
-                $site_zone       = $site['zone_tag'] ?? '';
+                $site_zone       = $site['ruleset']['zone_tag'] ?? ($site['zone_tag'] ?? '');
+                $site_host       = strtolower($site['ruleset']['zone_name'] ?? ($site['host'] ?? ''));
+                $clean_site_host = preg_replace('/^www\./i', '', trim($site_host));
                 $site_tag        = $site['site_tag'] ?? '';
 
                 $matches = false;
-                if (!empty($this->zone_id) && $site_zone === $this->zone_id) {
+                if (!empty($this->zone_id) && !empty($site_zone) && $site_zone === $this->zone_id) {
                     $matches = true;
                 } elseif (!empty($this->site_tag) && $site_tag === $this->site_tag) {
                     $matches = true;
-                } elseif ($clean_host === $clean_site_host || strpos($clean_host, $clean_site_host) !== false || strpos($clean_site_host, $clean_host) !== false) {
+                } elseif (!empty($clean_site_host) && ($clean_host === $clean_site_host || strpos($clean_host, $clean_site_host) !== false || strpos($clean_site_host, $clean_host) !== false)) {
                     $matches = true;
                 }
 
@@ -208,7 +208,7 @@ class CF_Analytics_API {
                         'account_id' => $acc_id,
                         'site_tag'   => $site_tag,
                         'zone_tag'   => $site_zone,
-                        'host'       => $site_host,
+                        'host'       => !empty($site_host) ? $site_host : $clean_host,
                     ];
                 }
             }
@@ -241,7 +241,7 @@ class CF_Analytics_API {
                     update_option('cf_analytics_account_id', $zone_acc_id);
 
                     // Try querying RUM for this specific account
-                    $rum_res = wp_remote_get(self::REST_ENDPOINT . "/accounts/{$zone_acc_id}/rum/site_info/list", [
+                    $rum_res = wp_remote_get(self::REST_ENDPOINT . "/accounts/{$zone_acc_id}/rum/site_info/list?per_page=100", [
                         'timeout' => 15,
                         'headers' => [
                             'Authorization' => 'Bearer ' . $token,
@@ -254,14 +254,17 @@ class CF_Analytics_API {
                         $rum_body = json_decode(wp_remote_retrieve_body($rum_res), true);
                         if (!empty($rum_body['result']) && is_array($rum_body['result'])) {
                             foreach ($rum_body['result'] as $site) {
-                                if (($site['zone_tag'] ?? '') === $site_zone || ($site['host'] ?? '') === $clean_host) {
+                                $s_zone = $site['ruleset']['zone_tag'] ?? ($site['zone_tag'] ?? '');
+                                $s_host = strtolower($site['ruleset']['zone_name'] ?? ($site['host'] ?? ''));
+                                $s_clean_host = preg_replace('/^www\./i', '', trim($s_host));
+                                if ((!empty($s_zone) && $s_zone === $site_zone) || (!empty($s_clean_host) && ($s_clean_host === $clean_host || strpos($clean_host, $s_clean_host) !== false || strpos($s_clean_host, $clean_host) !== false))) {
                                     $this->site_tag = $site['site_tag'] ?? '';
                                     update_option('cf_analytics_site_tag', $this->site_tag);
                                     return [
                                         'account_id' => $zone_acc_id,
                                         'site_tag'   => $this->site_tag,
                                         'zone_tag'   => $site_zone,
-                                        'host'       => $site['host'] ?? $clean_host,
+                                        'host'       => !empty($s_host) ? $s_host : $clean_host,
                                     ];
                                 }
                             }
