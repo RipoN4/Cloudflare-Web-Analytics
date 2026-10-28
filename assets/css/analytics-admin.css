@@ -1,0 +1,1997 @@
+/**
+ * Cloudflare Edge Analytics - Admin Stylesheet
+ * Clean Modern White Theme
+ * Zero emojis, 100% WordPress Dashicons integration.
+ */
+
+:root {
+    --cf-bg: #f0f2f5;
+    --cf-card-bg: #ffffff;
+    --cf-card-hover: #f8fafc;
+    --cf-border: #e2e8f0;
+    --cf-border-strong: #cbd5e1;
+    --cf-text-main: #0f172a;
+    --cf-text-sub: #334155;
+    --cf-text-muted: #64748b;
+    --cf-text-dim: #94a3b8;
+
+    --cf-blue: #2563eb;
+    --cf-blue-dark: #1d4ed8;
+    --cf-blue-navy: #1e3a8a;
+    --cf-blue-sky: #3b82f6;
+    --cf-blue-light: #eff6ff;
+    --cf-cyan: #0891b2;
+    --cf-cyan-light: #ecfeff;
+    --cf-green: #059669;
+    --cf-green-light: #ecfdf5;
+    --cf-green-border: #bbf7d0;
+    --cf-green-subtle: #f0fdf4;
+    --cf-green-text: #14532d;
+    --cf-green-code-bg: #dcfce7;
+    --cf-green-code-text: #166534;
+    --cf-green-dot: #16a34a;
+    --cf-indigo: #4f46e5;
+    --cf-indigo-light: #eef2ff;
+    --cf-amber: #d97706;
+    --cf-amber-light: #fffbeb;
+    --cf-rose: #e11d48;
+
+    --cf-radius: 10px;
+    --cf-radius-md: 8px;
+    --cf-radius-sm: 6px;
+    --cf-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --cf-shadow: 0 4px 12px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+    --cf-shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.08);
+    --cf-transition: all 0.2s ease-in-out;
+}
+
+/* ==========================================================================
+   Base Layout & Typography
+   ========================================================================== */
+
+.cf-analytics-wrap {
+    margin: 20px 20px 40px 0;
+    max-width: 1440px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: var(--cf-text-main);
+    box-sizing: border-box;
+}
+
+.cf-analytics-wrap *,
+.cf-analytics-wrap *::before,
+.cf-analytics-wrap *::after {
+    box-sizing: inherit;
+}
+
+/* Header */
+.cf-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--cf-border);
+}
+
+.cf-header-title-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cf-logo-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--cf-blue-light);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--cf-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cf-blue);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.12);
+}
+
+.cf-logo-icon .dashicons {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+}
+
+.cf-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--cf-text-main);
+    letter-spacing: -0.01em;
+}
+
+.cf-page-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: var(--cf-text-muted);
+}
+
+.cf-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   Duration Filter Dropdown
+   ========================================================================== */
+
+.cf-duration-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.wp-core-ui .cf-analytics-wrap .button.cf-duration-btn,
+.button.cf-duration-btn {
+    background: #ffffff !important;
+    border: 1px solid var(--cf-border-strong) !important;
+    color: var(--cf-text-main) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 0 14px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: var(--cf-radius-sm) !important;
+    cursor: pointer !important;
+    box-shadow: var(--cf-shadow-sm) !important;
+    gap: 7px !important;
+    transition: var(--cf-transition) !important;
+}
+
+.wp-core-ui .cf-analytics-wrap .button.cf-duration-btn:hover,
+.wp-core-ui .cf-analytics-wrap .button.cf-duration-btn:focus,
+.button.cf-duration-btn:hover,
+.button.cf-duration-btn:focus {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: var(--cf-text-main) !important;
+}
+
+.cf-duration-btn .cf-btn-caret {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: var(--cf-text-muted) !important;
+    transition: transform 0.2s ease !important;
+    margin-left: 2px !important;
+}
+
+.cf-duration-dropdown.is-open .cf-btn-caret {
+    transform: rotate(180deg) !important;
+}
+
+.cf-duration-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 180px;
+    background: #ffffff;
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius);
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    padding: 6px;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cf-duration-dropdown.is-open .cf-duration-menu {
+    display: flex;
+}
+
+.cf-duration-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--cf-text-main);
+    text-decoration: none !important;
+    border-radius: var(--cf-radius-sm);
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.cf-duration-item:hover {
+    background-color: #f1f5f9;
+    color: var(--cf-blue);
+}
+
+.cf-duration-item.cf-duration-active {
+    background-color: var(--cf-blue-light);
+    color: var(--cf-blue);
+    font-weight: 600;
+}
+
+.cf-duration-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    line-height: 1 !important;
+    color: var(--cf-text-muted);
+}
+
+.cf-duration-item.cf-duration-active .cf-duration-icon {
+    color: var(--cf-blue);
+}
+
+.cf-duration-item .dashicons-marker {
+    opacity: 0;
+}
+
+/* Status Pill */
+.cf-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #ffffff;
+    border: 1px solid var(--cf-border-strong);
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cf-text-sub);
+    box-shadow: var(--cf-shadow-sm);
+}
+
+.cf-status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cf-green);
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.5);
+}
+
+.cf-status-demo .cf-status-indicator {
+    background: var(--cf-amber);
+    box-shadow: 0 0 6px rgba(217, 119, 6, 0.5);
+}
+
+/* ==========================================================================
+   WordPress UI Conflict-Proof Button & Icon System
+   ========================================================================== */
+
+.wp-core-ui .cf-analytics-wrap .button,
+.wp-core-ui .cf-card .button,
+.cf-analytics-wrap .button,
+.button.cf-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    line-height: 1 !important;
+    padding: 0 16px !important;
+    background: var(--cf-card-bg) !important;
+    border: 1px solid var(--cf-border-strong) !important;
+    border-radius: var(--cf-radius-sm) !important;
+    color: var(--cf-text-main) !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    box-shadow: var(--cf-shadow-sm) !important;
+    transition: var(--cf-transition) !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+.wp-core-ui .cf-analytics-wrap .button:hover,
+.wp-core-ui .cf-analytics-wrap .button:focus,
+.cf-analytics-wrap .button:hover,
+.cf-analytics-wrap .button:focus,
+.button.cf-btn:hover,
+.button.cf-btn:focus {
+    background: var(--cf-card-hover) !important;
+    border-color: var(--cf-blue) !important;
+    color: var(--cf-blue) !important;
+}
+
+/* Dashicons inside buttons - perfectly aligned and sized, neutralizing WP default icon shifts */
+.cf-analytics-wrap .button .dashicons,
+.cf-card .button .dashicons,
+.button.cf-btn .dashicons,
+.cf-btn-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+    color: inherit !important;
+}
+
+/* Primary Action Buttons (Connect, Submit / Save) */
+.wp-core-ui .cf-analytics-wrap .button.button-primary,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-submit,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-connect,
+.button.cf-btn-submit,
+.button.cf-btn-connect {
+    background: var(--cf-blue) !important;
+    border: 1px solid var(--cf-blue-dark) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25) !important;
+}
+
+.wp-core-ui .cf-analytics-wrap .button.button-primary:hover,
+.wp-core-ui .cf-analytics-wrap .button.button-primary:focus,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-submit:hover,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-submit:focus,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-connect:hover,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-connect:focus,
+.button.cf-btn-submit:hover,
+.button.cf-btn-submit:focus,
+.button.cf-btn-connect:hover,
+.button.cf-btn-connect:focus {
+    background: var(--cf-blue-dark) !important;
+    border-color: var(--cf-blue-navy) !important;
+    color: #ffffff !important;
+}
+
+/* Compact Secondary Button (e.g. Change Token) */
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-secondary-sm,
+.button.cf-btn-secondary-sm {
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    gap: 4px !important;
+    background: var(--cf-card-bg) !important;
+    border: 1px solid var(--cf-border-strong) !important;
+    color: var(--cf-text-main) !important;
+    border-radius: var(--cf-radius-sm) !important;
+}
+
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-secondary-sm:hover,
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-secondary-sm:focus,
+.button.cf-btn-secondary-sm:hover,
+.button.cf-btn-secondary-sm:focus {
+    background: var(--cf-card-hover) !important;
+    border-color: var(--cf-text-dim) !important;
+    color: var(--cf-text-main) !important;
+}
+
+.wp-core-ui .cf-analytics-wrap .button.cf-btn-secondary-sm .dashicons,
+.button.cf-btn-secondary-sm .dashicons {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.cf-refresh-spin {
+    animation: cfSpin 1s infinite linear;
+}
+
+@keyframes cfSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Notice Banner */
+.cf-notice-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--cf-amber-light);
+    border: 1px solid #fde68a;
+    border-left: 4px solid var(--cf-amber);
+    border-radius: var(--cf-radius-sm);
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    color: #92400e;
+    font-size: 13px;
+    box-shadow: var(--cf-shadow-sm);
+}
+
+.cf-notice-success {
+    background: var(--cf-green-light);
+    border-color: #a7f3d0;
+    border-left-color: var(--cf-green);
+    color: #065f46;
+}
+
+.cf-banner-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--cf-amber);
+}
+
+.cf-notice-success .cf-banner-icon {
+    color: var(--cf-green);
+}
+
+.cf-banner-content {
+    flex: 1;
+}
+
+.cf-banner-content strong {
+    color: var(--cf-text-main);
+    margin-right: 4px;
+}
+
+.cf-banner-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--cf-blue);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.cf-banner-link:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Clean White Cards
+   ========================================================================== */
+
+.cf-card {
+    background: var(--cf-card-bg);
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius);
+    padding: 22px;
+    position: relative;
+    box-shadow: var(--cf-shadow);
+    transition: var(--cf-transition);
+}
+
+.cf-card:hover {
+    border-color: #cbd5e1;
+}
+
+.cf-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.cf-header-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cf-header-icon {
+    color: var(--cf-blue);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.cf-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    margin: 0;
+}
+
+.cf-card-subtitle {
+    font-size: 12px;
+    color: var(--cf-text-muted);
+    margin: 2px 0 0 0;
+}
+
+.cf-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--cf-text-muted);
+}
+
+.cf-card-meta .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.cf-tag-pill {
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #f1f5f9;
+    color: var(--cf-text-sub);
+    border: 1px solid var(--cf-border);
+    border-radius: 9999px;
+}
+
+/* ==========================================================================
+   Top 4 Metric Overview Cards (White Theme)
+   ========================================================================== */
+
+.cf-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cf-metric-card {
+    background: var(--cf-card-bg);
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: var(--cf-shadow-sm);
+    transition: var(--cf-transition);
+}
+
+.cf-metric-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: var(--cf-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.cf-metric-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--cf-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cf-metric-icon-box .dashicons {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+.cf-icon-cyan {
+    background: var(--cf-cyan-light);
+    border: 1px solid #cffafe;
+    color: var(--cf-cyan);
+}
+
+.cf-icon-blue {
+    background: var(--cf-blue-light);
+    border: 1px solid #dbeafe;
+    color: var(--cf-blue);
+}
+
+.cf-icon-indigo {
+    background: var(--cf-indigo-light);
+    border: 1px solid #e0e7ff;
+    color: var(--cf-indigo);
+}
+
+.cf-icon-green {
+    background: var(--cf-green-light);
+    border: 1px solid #d1fae5;
+    color: var(--cf-green);
+}
+
+.cf-metric-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.cf-metric-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cf-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cf-metric-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--cf-text-main);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.cf-metric-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    margin-top: 4px;
+    color: var(--cf-text-muted);
+}
+
+.cf-metric-badge .dashicons {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+}
+
+.cf-badge-green {
+    color: var(--cf-green);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Main Charts Grid
+   ========================================================================== */
+
+.cf-charts-main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
+/* ==========================================================================
+   Chart 2: 24-Hour Area Line Graph Widget
+   ========================================================================== */
+
+.cf-24h-widget {
+    padding-bottom: 20px;
+}
+
+.cf-24h-metric-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cf-pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--cf-blue);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+}
+
+.cf-pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--cf-blue);
+    opacity: 0.5;
+    animation: cfPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes cfPulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+.cf-metric-label {
+    font-size: 14px;
+    color: var(--cf-text-muted);
+}
+
+.cf-metric-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--cf-text-main);
+    letter-spacing: -0.02em;
+}
+
+/* SVG Chart Interactive Area */
+.cf-chart-interactive-wrapper {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.cf-spline-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+/* Floating Pill Tooltip (White Theme) */
+.cf-spline-tooltip {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    border: 1px solid var(--cf-border-strong);
+    border-radius: 9999px;
+    padding: 6px 16px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--cf-text-main);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+}
+
+.cf-spline-tooltip-time {
+    color: var(--cf-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    border-right: 1px solid var(--cf-border);
+    padding-right: 8px;
+}
+
+.cf-spline-tooltip-val {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cf-dot-small {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cf-blue);
+}
+
+.cf-spline-tooltip-val strong {
+    color: var(--cf-blue);
+    font-weight: 800;
+}
+
+/* Bottom X Axis */
+.cf-x-axis-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0 60px;
+    border-top: 1px solid var(--cf-border);
+}
+
+.cf-x-ticks {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    max-width: 650px;
+}
+
+.cf-x-tick-label {
+    font-size: 11px;
+    color: var(--cf-text-muted);
+}
+
+.cf-timezone-label {
+    font-size: 11px;
+    color: var(--cf-text-dim);
+}
+
+/* ==========================================================================
+   2-Column Section inside Widget 1 (Top 5 Referrers & Top 5 Pages)
+   ========================================================================== */
+
+.cf-widget-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+
+.cf-subcard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.cf-subcard-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    margin: 0;
+}
+
+/* Simple List (text & number only) for WP Dashboard Widget */
+.cf-simple-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+.cf-simple-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #c3c4c7;
+    font-size: 13px;
+    line-height: 1.4;
+    min-width: 0;
+    gap: 8px;
+}
+
+.cf-simple-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.cf-simple-text {
+    color: var(--cf-text-main);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-right: 6px;
+}
+
+.cf-simple-link {
+    color: var(--cf-blue);
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding-right: 6px;
+}
+
+.cf-simple-link:hover {
+    color: var(--cf-blue-dark);
+    text-decoration: underline;
+}
+
+.cf-simple-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Chart 1: Last 30 Days Candle Bar Chart
+   ========================================================================== */
+
+.cf-30d-totals-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cf-30d-total-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cf-total-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cf-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cf-total-value {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.cf-val-pageviews {
+    color: var(--cf-blue);
+}
+
+.cf-val-uniques {
+    color: var(--cf-blue-navy);
+}
+
+.cf-legend-group {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.cf-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--cf-text-sub);
+}
+
+.cf-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.cf-color-pageviews {
+    background: var(--cf-blue-sky);
+}
+
+.cf-color-uniques {
+    background: var(--cf-blue-navy);
+}
+
+.cf-30d-chart-body {
+    display: flex;
+    gap: 16px;
+    height: 240px;
+    margin-top: 16px;
+    position: relative;
+}
+
+.cf-30d-y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    width: 20px;
+    text-align: right;
+}
+
+.cf-y-label {
+    font-size: 11px;
+    color: var(--cf-text-muted);
+}
+
+.cf-30d-bars-track {
+    flex: 1;
+    position: relative;
+    border-bottom: 1px solid var(--cf-border-strong);
+    padding-bottom: 8px;
+}
+
+.cf-bars-flex {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    gap: 3px;
+}
+
+.cf-candle-col {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+    position: relative;
+    padding: 0 1px;
+}
+
+.cf-candle-bar-slot {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    border-radius: 4px 4px 0 0;
+}
+
+/* Sky-Blue Outer Bar (Pageviews) */
+.cf-candle-bar-outer {
+    width: 100%;
+    background: var(--cf-blue-sky);
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    min-height: 4px;
+}
+
+/* Darker Navy-Blue Inner Base (Unique Visitors) */
+.cf-candle-bar-inner {
+    width: 100%;
+    background: var(--cf-blue-navy);
+    border-radius: 0 0 0 0;
+    min-height: 2px;
+    transition: background-color 0.2s ease;
+}
+
+.cf-candle-col:hover .cf-candle-bar-outer {
+    background: #60a5fa;
+    transform: scaleY(1.03);
+    transform-origin: bottom;
+}
+
+.cf-candle-col:hover .cf-candle-bar-inner {
+    background: #1e40af;
+}
+
+/* 30D Interactive Tooltip (White Theme) */
+.cf-bar-tooltip {
+    position: absolute;
+    top: 10px;
+    background: #ffffff;
+    border: 1px solid var(--cf-border-strong);
+    border-radius: var(--cf-radius-sm);
+    padding: 10px 14px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    z-index: 20;
+    pointer-events: none;
+    min-width: 160px;
+    transform: translateX(-50%);
+    animation: cfFadeIn 0.15s ease;
+}
+
+@keyframes cfFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.cf-bar-tooltip-date {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.cf-bar-tooltip-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cf-blue), transparent);
+    margin-bottom: 8px;
+}
+
+.cf-bar-tooltip-columns {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cf-bar-tooltip-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cf-tt-label {
+    font-size: 10px;
+    color: var(--cf-text-muted);
+    text-transform: uppercase;
+}
+
+.cf-tt-val {
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.cf-text-cyan {
+    color: var(--cf-cyan);
+}
+
+.cf-text-blue {
+    color: var(--cf-blue);
+}
+
+.cf-30d-date-range {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0 0 64px;
+    font-size: 12px;
+    color: var(--cf-text-muted);
+}
+
+.cf-range-start,
+.cf-range-end {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cf-range-start .dashicons,
+.cf-range-end .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--cf-text-dim);
+}
+
+/* View More Button Footer in Widget 2 */
+.cf-widget-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--cf-border);
+}
+
+.button.cf-btn-view-more {
+    background: var(--cf-blue);
+    border: 1px solid var(--cf-blue-dark);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 7px 18px;
+    border-radius: var(--cf-radius-sm);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.button.cf-btn-view-more:hover,
+.button.cf-btn-view-more:focus {
+    background: var(--cf-blue-dark);
+    border-color: #172554;
+    color: #ffffff;
+}
+
+.button.cf-btn-view-more .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.button.cf-btn-view-more:hover .dashicons {
+    transform: translateX(2px);
+}
+
+/* ==========================================================================
+   Breakdown Lists (White Theme)
+   ========================================================================== */
+
+.cf-breakdowns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.cf-breakdown-card {
+    padding: 20px 18px;
+}
+
+.cf-breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cf-list-item {
+    position: relative;
+    border-radius: var(--cf-radius-sm);
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid var(--cf-border);
+    transition: var(--cf-transition);
+}
+
+.cf-list-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.cf-item-progress-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.02) 100%);
+    pointer-events: none;
+    transition: width 0.4s ease;
+}
+
+.cf-item-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    z-index: 1;
+}
+
+.cf-rank-badge {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 5px;
+    background: #e2e8f0;
+    color: var(--cf-text-sub);
+    flex-shrink: 0;
+}
+
+.cf-rank-top {
+    background: var(--cf-blue-light);
+    color: var(--cf-blue);
+    border: 1px solid #bfdbfe;
+}
+
+.cf-item-icon-box {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cf-text-muted);
+    flex-shrink: 0;
+}
+
+.cf-item-icon-box .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.cf-flag-box {
+    width: 24px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+
+.cf-flag-img {
+    width: 24px;
+    height: 18px;
+    object-fit: cover;
+    display: block;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.cf-country-badge {
+    padding: 2px 6px;
+    background: var(--cf-blue-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cf-blue);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.cf-item-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.cf-item-primary {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cf-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.cf-item-title-row .cf-item-primary {
+    flex: 1;
+    min-width: 0;
+}
+
+.cf-edit-post-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cf-text-dim);
+    text-decoration: none !important;
+    padding: 2px 3px;
+    border-radius: var(--cf-radius-sm);
+    transition: var(--cf-transition);
+    opacity: 0.5;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.cf-edit-post-link .dashicons {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    line-height: 1 !important;
+}
+
+.cf-list-item:hover .cf-edit-post-link {
+    opacity: 1;
+    color: var(--cf-blue);
+}
+
+.cf-edit-post-link:hover {
+    color: var(--cf-blue-dark) !important;
+    background-color: var(--cf-blue-light);
+}
+
+.cf-page-anchor {
+    color: var(--cf-text-main);
+    text-decoration: none;
+    transition: var(--cf-transition);
+}
+
+.cf-page-anchor:hover {
+    color: var(--cf-blue);
+    text-decoration: underline;
+}
+
+.cf-item-secondary {
+    font-size: 11px;
+    color: var(--cf-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cf-item-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    flex-shrink: 0;
+}
+
+.cf-empty-state {
+    text-align: center;
+    padding: 24px 10px;
+    color: var(--cf-text-muted);
+}
+
+.cf-empty-state .dashicons {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   Settings Page Styles (White Theme)
+   ========================================================================== */
+
+.cf-settings-container {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+@media (max-width: 960px) {
+    .cf-settings-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cf-form-group {
+    margin-bottom: 22px;
+}
+
+.cf-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-main);
+    margin-bottom: 8px;
+}
+
+.cf-required {
+    color: var(--cf-rose);
+}
+
+.cf-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cf-input-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--cf-text-dim);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+.cf-input {
+    width: 100%;
+    padding: 9px 14px;
+    background: var(--cf-card-bg);
+    border: 1px solid var(--cf-border-strong);
+    border-radius: var(--cf-radius-sm);
+    color: var(--cf-text-main);
+    font-size: 13px;
+    line-height: 1.4;
+    transition: var(--cf-transition);
+    box-sizing: border-box;
+}
+
+.cf-input-wrap .cf-input-icon + .cf-input {
+    padding-left: 38px;
+}
+
+.cf-input-wrap .cf-input[type="password"] {
+    padding-right: 38px;
+}
+
+.cf-input:focus {
+    border-color: var(--cf-blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    background: var(--cf-card-bg);
+}
+
+.cf-toggle-password {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--cf-text-dim);
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: var(--cf-transition);
+}
+
+.cf-toggle-password:hover {
+    color: var(--cf-blue);
+    background: var(--cf-card-hover);
+}
+
+.cf-toggle-password .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 1;
+}
+
+.cf-help-text {
+    display: block;
+    font-size: 12px;
+    color: var(--cf-text-muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   Modern Settings UI & Smart Connection Card
+   ========================================================================== */
+
+.cf-connection-status-card {
+    background: var(--cf-card-hover);
+    border: 1px solid var(--cf-border-strong);
+    border-radius: var(--cf-radius-md);
+    padding: 20px;
+    margin-bottom: 24px;
+    transition: var(--cf-transition);
+}
+
+.cf-connection-status-card.cf-connected {
+    background: var(--cf-green-subtle);
+    border-color: var(--cf-green-border);
+}
+
+.cf-conn-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--cf-green-code-bg);
+}
+
+.cf-conn-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cf-status-indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--cf-green-dot);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+.cf-conn-badge-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cf-green-text);
+}
+
+.cf-conn-metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.cf-conn-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cf-conn-meta-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--cf-green);
+}
+
+.cf-conn-meta-value {
+    font-size: 13px;
+    color: var(--cf-text-main);
+    font-weight: 600;
+}
+
+.cf-conn-meta-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: var(--cf-green-code-text);
+    background: var(--cf-green-code-bg);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cf-token-setup-box {
+    margin-bottom: 24px;
+    transition: var(--cf-transition);
+}
+
+.cf-token-setup-box.cf-token-hidden {
+    display: none;
+}
+
+.cf-token-action-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Progressive Disclosure Accordion */
+.cf-advanced-accordion {
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius-md);
+    background: var(--cf-card-bg);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: var(--cf-transition);
+}
+
+.cf-advanced-accordion[open] {
+    border-color: var(--cf-border-strong);
+}
+
+.cf-advanced-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    background: var(--cf-card-hover);
+    user-select: none;
+    font-size: 13px;
+    color: var(--cf-text-main);
+    transition: background 0.15s ease;
+}
+
+.cf-advanced-summary::-webkit-details-marker {
+    display: none;
+}
+
+.cf-advanced-summary:hover {
+    background: var(--cf-border);
+}
+
+.cf-summary-icon {
+    color: var(--cf-text-muted);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+}
+
+.cf-summary-title {
+    font-weight: 600;
+    color: var(--cf-text-main);
+}
+
+.cf-summary-pill {
+    font-size: 11px;
+    background: var(--cf-border);
+    color: var(--cf-text-muted);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.cf-summary-arrow {
+    margin-left: auto;
+    color: var(--cf-text-muted);
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.cf-advanced-accordion[open] .cf-summary-arrow {
+    transform: rotate(180deg);
+}
+
+.cf-advanced-content {
+    padding: 20px;
+    border-top: 1px solid var(--cf-border);
+    background: var(--cf-card-bg);
+}
+
+.cf-advanced-desc {
+    font-size: 12px;
+    color: var(--cf-text-muted);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.cf-settings-section-box {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius);
+}
+
+.cf-settings-subheading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cf-border);
+}
+
+.cf-subheading-icon {
+    font-size: 17px !important;
+    width: 17px !important;
+    height: 17px !important;
+    line-height: 1 !important;
+    color: var(--cf-blue) !important;
+}
+
+.cf-subheading-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cf-text-main);
+    letter-spacing: -0.01em;
+}
+
+.cf-settings-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cf-setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cf-setting-row-text {
+    flex: 1;
+    min-width: 200px;
+}
+
+.cf-setting-title {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-main);
+    margin-bottom: 2px;
+}
+
+.cf-setting-hint {
+    margin: 0;
+    font-size: 12px;
+    color: var(--cf-text-muted);
+    line-height: 1.4;
+}
+
+.cf-setting-row-input {
+    flex-shrink: 0;
+}
+
+.cf-select {
+    cursor: pointer;
+    background-color: #ffffff;
+    max-width: 420px;
+    height: 36px;
+    border-radius: var(--cf-radius-sm);
+    border: 1px solid var(--cf-border-strong);
+    color: var(--cf-text-main);
+    font-size: 13px;
+    padding: 0 12px;
+    transition: var(--cf-transition);
+}
+
+.cf-select:focus {
+    border-color: var(--cf-blue);
+    box-shadow: 0 0 0 1px var(--cf-blue);
+    outline: none;
+}
+
+.cf-select-compact {
+    min-width: 240px;
+}
+
+.cf-clean-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-main);
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid var(--cf-border-strong);
+    padding: 7px 14px;
+    border-radius: var(--cf-radius-sm);
+    box-shadow: var(--cf-shadow-sm);
+    transition: var(--cf-transition);
+}
+
+.cf-clean-checkbox:hover {
+    border-color: var(--cf-blue);
+    background: #ffffff;
+}
+
+.cf-clean-checkbox input[type="checkbox"] {
+    margin: 0 !important;
+    cursor: pointer;
+    border-radius: 4px;
+    accent-color: var(--cf-blue);
+}
+
+.cf-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--cf-border);
+}
+
+/* Guide Card */
+.cf-guide-card {
+    background: var(--cf-card-hover);
+}
+
+.cf-steps-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.cf-steps-list li {
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--cf-text-sub);
+    line-height: 1.5;
+}
+
+.cf-steps-list li strong {
+    color: var(--cf-text-main);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.cf-steps-list li p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--cf-text-muted);
+}
+
+.cf-settings-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* FAQ Card */
+.cf-faq-card {
+    background: var(--cf-card-bg);
+}
+
+.cf-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 6px 0 0 0;
+}
+
+.cf-faq-item {
+    border: 1px solid var(--cf-border);
+    border-radius: var(--cf-radius-sm);
+    background: #ffffff;
+    transition: var(--cf-transition);
+    overflow: hidden;
+}
+
+.cf-faq-item:hover {
+    border-color: var(--cf-border-strong);
+}
+
+.cf-faq-item[open] {
+    border-color: var(--cf-blue);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+}
+
+.cf-faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cf-text-main);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    transition: var(--cf-transition);
+}
+
+.cf-faq-question::-webkit-details-marker {
+    display: none;
+}
+
+.cf-faq-question:hover {
+    color: var(--cf-blue);
+    background: #f8fafc;
+}
+
+.cf-faq-title {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.cf-faq-arrow {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    line-height: 1 !important;
+    color: var(--cf-text-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.cf-faq-item[open] .cf-faq-arrow {
+    transform: rotate(180deg);
+    color: var(--cf-blue);
+}
+
+.cf-faq-answer {
+    padding: 10px 14px 14px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--cf-text-sub);
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfe;
+}
+
+.cf-faq-answer p {
+    margin: 0 0 8px 0;
+}
+
+.cf-faq-answer p:last-child {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   WordPress Native Core Dashboard Widget Styles
+   (#cf_widget_24h_overview, #cf_widget_30d_analytics)
+   ========================================================================== */
+
+#cf_widget_24h_overview .inside,
+#cf_widget_30d_analytics .inside {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+}
+
+#cf_widget_24h_overview .cf-card,
+#cf_widget_30d_analytics .cf-card {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+    .cf-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cf-widget-two-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .cf-x-axis-row {
+        padding-left: 10px;
+    }
+
+    .cf-30d-date-range {
+        padding-left: 10px;
+    }
+}
