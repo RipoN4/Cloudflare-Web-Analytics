@@ -333,7 +333,18 @@ class CF_Analytics_API {
 
         // Fallback to Zone-level Analytics if Zone ID is present
         if (!empty($this->zone_id)) {
-            return $this->fetch_zone_analytics($period);
+            $zone_res = $this->fetch_zone_analytics($period);
+            if (!is_wp_error($zone_res)) {
+                return $zone_res;
+            }
+        }
+
+        if (isset($rum_res) && is_wp_error($rum_res)) {
+            return $rum_res;
+        }
+
+        if (isset($zone_res) && is_wp_error($zone_res)) {
+            return $zone_res;
         }
 
         return new WP_Error('cf_missing_credentials', __('Please enter your Cloudflare API Token, Account ID, and Site Tag (or Zone ID).', 'cf-edge-analytics'));
@@ -370,8 +381,8 @@ class CF_Analytics_API {
         $start_24h = gmdate('Y-m-d\TH:i:s\Z', strtotime('-24 hours'));
 
         $query = 'query GetWebAnalyticsRUM(
-            $accountTag: string!,
-            $siteTag: string!,
+            $accountTag: String!,
+            $siteTag: String!,
             $startPeriod: Time!,
             $start24h: Time!
         ) {
@@ -384,14 +395,14 @@ class CF_Analytics_API {
                             datetime_geq: $startPeriod,
                             bot: 0
                         },
-                        orderBy: [datetimeDay_ASC]
+                        orderBy: [date_ASC]
                     ) {
                         count
                         sum {
                             visits
                         }
                         dimensions {
-                            datetimeDay
+                            date
                         }
                     }
                     hourly_24h: rumPageloadEventsAdaptiveGroups(
@@ -570,7 +581,7 @@ class CF_Analytics_API {
         $max_daily_views        = 1;
 
         foreach ($daily_raw as $item) {
-            $date    = $item['dimensions']['datetimeDay'] ?? '';
+            $date    = $item['dimensions']['date'] ?? ($item['dimensions']['datetimeDay'] ?? '');
             $views   = (int) ($item['count'] ?? 0);
             $uniques = (int) ($item['sum']['visits'] ?? 0);
 
@@ -854,7 +865,7 @@ class CF_Analytics_API {
 
         $iso_24_hours_ago = gmdate('Y-m-d\TH:i:s\Z', strtotime('-24 hours'));
 
-        $query = 'query GetCloudflareAnalytics($zoneTag: string!) {
+        $query = 'query GetCloudflareAnalytics($zoneTag: String!) {
             viewer {
                 zones(filter: { zoneTag: $zoneTag }) {
                     httpRequests1dGroups(

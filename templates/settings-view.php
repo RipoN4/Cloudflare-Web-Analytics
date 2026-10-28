@@ -47,8 +47,15 @@ $admin_bar_counter = (int) get_option('cf_analytics_admin_bar_counter', 1);
             </div>
         </div>
         <?php
+        if (class_exists('CF_Edge_Analytics')) {
+            CF_Edge_Analytics::get_instance()->api->clear_all_caches();
+        }
         delete_transient('cf_analytics_data_cache');
         delete_transient('cf_analytics_cache_timestamp');
+        foreach (['24h', '7d', '14d', '30d'] as $p) {
+            delete_transient('cf_analytics_data_cache_' . $p);
+            delete_transient('cf_analytics_cache_timestamp_' . $p);
+        }
         ?>
     <?php endif; ?>
 
