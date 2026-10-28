@@ -117,18 +117,19 @@ class CF_Analytics_API {
     /**
      * Auto-detect Account ID, Web Analytics Site Tag, and Zone ID using API Token
      *
-     * Auto-detect Account ID, Web Analytics Site Tag, and Zone ID using API Token
+    /**
+     * Fetch all Web Analytics (RUM) sites across all accessible accounts
      *
      * @param string|null $override_token Optional token to test
-     * @return array|WP_Error
+     * @return array|WP_Error Array with 'sites' list and 'current_host'
      */
-    public function auto_detect_credentials($override_token = null) {
+    public function fetch_all_account_sites($override_token = null) {
         $token = !empty($override_token) ? trim($override_token) : $this->api_token;
         if (empty($token)) {
             return new WP_Error('no_token', __('Cloudflare API Token is required.', 'cf-edge-analytics'));
         }
 
-        $host       = strtolower(parse_url(home_url(), PHP_URL_HOST));
+        $host       = strtolower((string) parse_url(home_url(), PHP_URL_HOST));
         $clean_host = preg_replace('/^www\./i', '', $host);
 
         $accounts = [];
@@ -150,9 +151,42 @@ class CF_Analytics_API {
             }
         }
 
-        // 2. Iterate accounts and check Web Analytics (RUM) properties
+        // If accounts empty, check stored account_id or zone lookup fallback
+        if (empty($accounts) && !empty($this->account_id)) {
+            $accounts[] = ['id' => $this->account_id, 'name' => 'Current Account'];
+        }
+
+        if (empty($accounts)) {
+            $zone_res = wp_remote_get(self::REST_ENDPOINT . '/zones?name=' . urlencode($clean_host), [
+                'timeout' => 15,
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type'  => 'application/json',
+                    'User-Agent'    => 'WordPress-CF-Analytics/1.0',
+                ],
+            ]);
+            if (!is_wp_error($zone_res) && wp_remote_retrieve_response_code($zone_res) === 200) {
+                $z_body = json_decode(wp_remote_retrieve_body($zone_res), true);
+                if (!empty($z_body['result'][0]['account']['id'])) {
+                    $accounts[] = [
+                        'id'   => $z_body['result'][0]['account']['id'],
+                        'name' => $z_body['result'][0]['account']['name'] ?? 'Account',
+                    ];
+                }
+            }
+        }
+
+        if (empty($accounts)) {
+            return new WP_Error('no_accounts', __('No Cloudflare accounts could be retrieved with this API Token. Please check token permissions (Account > Account Settings > Read).', 'cf-edge-analytics'));
+        }
+
+        $all_sites      = [];
+        $seen_site_tags = [];
+
+        // 2. Iterate accounts and fetch Web Analytics (RUM) properties
         foreach ($accounts as $acc) {
-            $acc_id = $acc['id'] ?? '';
+            $acc_id   = $acc['id'] ?? '';
+            $acc_name = $acc['name'] ?? '';
             if (empty($acc_id)) {
                 continue;
             }
@@ -176,118 +210,120 @@ class CF_Analytics_API {
             }
 
             foreach ($rum_body['result'] as $site) {
+                $site_tag = $site['site_tag'] ?? '';
+                if (empty($site_tag) || isset($seen_site_tags[$site_tag])) {
+                    continue;
+                }
+                $seen_site_tags[$site_tag] = true;
+
                 $site_zone       = $site['ruleset']['zone_tag'] ?? ($site['zone_tag'] ?? '');
-                $site_host       = strtolower($site['ruleset']['zone_name'] ?? ($site['host'] ?? ''));
+                $site_host       = strtolower((string) ($site['ruleset']['zone_name'] ?? ($site['host'] ?? '')));
                 $clean_site_host = preg_replace('/^www\./i', '', trim($site_host));
-                $site_tag        = $site['site_tag'] ?? '';
+                if (empty($clean_site_host)) {
+                    $clean_site_host = (string) ($site['host'] ?? '');
+                }
 
-                $matches = false;
-                if (!empty($this->zone_id) && !empty($site_zone) && $site_zone === $this->zone_id) {
-                    $matches = true;
+                // Check if site matches current WP domain
+                $is_match = false;
+                if (!empty($clean_site_host) && ($clean_host === $clean_site_host || strpos($clean_host, $clean_site_host) !== false || strpos($clean_site_host, $clean_host) !== false)) {
+                    $is_match = true;
                 } elseif (!empty($this->site_tag) && $site_tag === $this->site_tag) {
-                    $matches = true;
-                } elseif (!empty($clean_site_host) && ($clean_host === $clean_site_host || strpos($clean_host, $clean_site_host) !== false || strpos($clean_site_host, $clean_host) !== false)) {
-                    $matches = true;
+                    $is_match = true;
                 }
 
-                if ($matches && !empty($site_tag)) {
-                    $this->account_id = $acc_id;
-                    $this->site_tag   = $site_tag;
-                    $this->api_token  = $token;
-                    if (!empty($site_zone)) {
-                        $this->zone_id = $site_zone;
-                    }
+                $is_active = (!empty($this->site_tag) && $this->site_tag === $site_tag);
 
-                    update_option('cf_analytics_account_id', $acc_id);
-                    update_option('cf_analytics_site_tag', $site_tag);
-                    if (!empty($site_zone)) {
-                        update_option('cf_analytics_zone_id', $site_zone);
-                    }
-
-                    return [
-                        'account_id' => $acc_id,
-                        'site_tag'   => $site_tag,
-                        'zone_tag'   => $site_zone,
-                        'host'       => !empty($site_host) ? $site_host : $clean_host,
-                    ];
-                }
-            }
-        }
-
-        // 3. Fallback: Check Zone API for domain match (useful if token has Zone permissions or account list was restricted)
-        $zone_res = wp_remote_get(self::REST_ENDPOINT . '/zones?name=' . urlencode($clean_host), [
-            'timeout' => 15,
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type'  => 'application/json',
-                'User-Agent'    => 'WordPress-CF-Analytics/1.0',
-            ],
-        ]);
-
-        if (!is_wp_error($zone_res) && wp_remote_retrieve_response_code($zone_res) === 200) {
-            $zone_body = json_decode(wp_remote_retrieve_body($zone_res), true);
-            if (!empty($zone_body['result'][0]['id'])) {
-                $matched_zone = $zone_body['result'][0];
-                $site_zone    = $matched_zone['id'];
-                $zone_acc_id  = $matched_zone['account']['id'] ?? '';
-
-                if (!empty($site_zone)) {
-                    $this->zone_id = $site_zone;
-                    update_option('cf_analytics_zone_id', $site_zone);
-                }
-
-                if (!empty($zone_acc_id)) {
-                    $this->account_id = $zone_acc_id;
-                    update_option('cf_analytics_account_id', $zone_acc_id);
-
-                    // Try querying RUM for this specific account
-                    $rum_res = wp_remote_get(self::REST_ENDPOINT . "/accounts/{$zone_acc_id}/rum/site_info/list?per_page=100", [
-                        'timeout' => 15,
-                        'headers' => [
-                            'Authorization' => 'Bearer ' . $token,
-                            'Content-Type'  => 'application/json',
-                            'User-Agent'    => 'WordPress-CF-Analytics/1.0',
-                        ],
-                    ]);
-
-                    if (!is_wp_error($rum_res) && wp_remote_retrieve_response_code($rum_res) === 200) {
-                        $rum_body = json_decode(wp_remote_retrieve_body($rum_res), true);
-                        if (!empty($rum_body['result']) && is_array($rum_body['result'])) {
-                            foreach ($rum_body['result'] as $site) {
-                                $s_zone = $site['ruleset']['zone_tag'] ?? ($site['zone_tag'] ?? '');
-                                $s_host = strtolower($site['ruleset']['zone_name'] ?? ($site['host'] ?? ''));
-                                $s_clean_host = preg_replace('/^www\./i', '', trim($s_host));
-                                if ((!empty($s_zone) && $s_zone === $site_zone) || (!empty($s_clean_host) && ($s_clean_host === $clean_host || strpos($clean_host, $s_clean_host) !== false || strpos($s_clean_host, $clean_host) !== false))) {
-                                    $this->site_tag = $site['site_tag'] ?? '';
-                                    update_option('cf_analytics_site_tag', $this->site_tag);
-                                    return [
-                                        'account_id' => $zone_acc_id,
-                                        'site_tag'   => $this->site_tag,
-                                        'zone_tag'   => $site_zone,
-                                        'host'       => !empty($s_host) ? $s_host : $clean_host,
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return [
-                    'account_id' => $zone_acc_id,
-                    'site_tag'   => '',
-                    'zone_tag'   => $site_zone,
-                    'host'       => $clean_host,
+                $all_sites[] = [
+                    'site_tag'     => $site_tag,
+                    'zone_tag'     => $site_zone,
+                    'domain'       => !empty($clean_site_host) ? $clean_site_host : 'Property (' . substr($site_tag, 0, 8) . ')',
+                    'account_id'   => $acc_id,
+                    'account_name' => $acc_name,
+                    'created'      => $site['created'] ?? '',
+                    'is_match'     => $is_match,
+                    'is_active'    => $is_active,
                 ];
             }
         }
 
-        // If no RUM site was found, store the first Account ID if not set
-        if (!empty($accounts[0]['id']) && empty($this->account_id)) {
-            $this->account_id = $accounts[0]['id'];
-            update_option('cf_analytics_account_id', $this->account_id);
+        if (empty($all_sites)) {
+            return new WP_Error('site_not_found', sprintf(__('No Web Analytics properties found for %s. Please ensure Web Analytics is enabled in your Cloudflare dashboard.', 'cf-edge-analytics'), esc_html($host)));
         }
 
-        return new WP_Error('site_not_found', sprintf(__('Could not automatically match a Web Analytics site for %s. Please enter your Site Tag manually.', 'cf-edge-analytics'), esc_html($host)));
+        // Sort: active/match first, then alphabetically
+        usort($all_sites, function ($a, $b) {
+            if ($a['is_active'] && !$b['is_active']) return -1;
+            if (!$a['is_active'] && $b['is_active']) return 1;
+            if ($a['is_match'] && !$b['is_match']) return -1;
+            if (!$a['is_match'] && $b['is_match']) return 1;
+            return strcasecmp($a['domain'], $b['domain']);
+        });
+
+        return [
+            'sites'          => $all_sites,
+            'current_domain' => $clean_host,
+            'total'          => count($all_sites),
+        ];
+    }
+
+    /**
+     * Auto-detect Account ID, Web Analytics Site Tag, and Zone ID using API Token
+     *
+     * @param string|null $override_token Optional token to test
+     * @return array|WP_Error
+     */
+    public function auto_detect_credentials($override_token = null) {
+        $token = !empty($override_token) ? trim($override_token) : $this->api_token;
+        if (empty($token)) {
+            return new WP_Error('no_token', __('Cloudflare API Token is required.', 'cf-edge-analytics'));
+        }
+
+        $result = $this->fetch_all_account_sites($token);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+
+        $sites = $result['sites'] ?? [];
+        if (empty($sites)) {
+            return new WP_Error('site_not_found', __('No Web Analytics sites found.', 'cf-edge-analytics'));
+        }
+
+        // Pick best matching site or first available
+        $selected = $sites[0];
+        foreach ($sites as $s) {
+            if (!empty($s['is_match'])) {
+                $selected = $s;
+                break;
+            }
+        }
+
+        $acc_id    = $selected['account_id'] ?? '';
+        $site_tag  = $selected['site_tag'] ?? '';
+        $site_zone = $selected['zone_tag'] ?? '';
+
+        $this->account_id = $acc_id;
+        $this->site_tag   = $site_tag;
+        $this->api_token  = $token;
+        if (!empty($site_zone)) {
+            $this->zone_id = $site_zone;
+        }
+
+        if (!empty($acc_id)) {
+            update_option('cf_analytics_account_id', $acc_id);
+        }
+        if (!empty($site_tag)) {
+            update_option('cf_analytics_site_tag', $site_tag);
+        }
+        if (!empty($site_zone)) {
+            update_option('cf_analytics_zone_id', $site_zone);
+        }
+
+        return [
+            'account_id' => $acc_id,
+            'site_tag'   => $site_tag,
+            'zone_tag'   => $site_zone,
+            'host'       => $selected['domain'] ?? $result['current_domain'],
+        ];
     }
 
     /**

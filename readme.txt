@@ -4,7 +4,7 @@ Donate link: https://ripon.in
 Tags: cloudflare, analytics, web analytics, pageviews, privacy, visitors, traffic
 Requires at least: 5.8
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -106,6 +106,13 @@ Preview Mode activates when an API token is not yet configured or when a newly c
 ---
 
 == Changelog ==
+
+= 1.1.0 =
+* Added: Interactive Property Picker Modal allowing users to search, browse, and manually select any site property from their Cloudflare account.
+* Added: 1-Click "Switch Domain" capability for websites that change domain names or operate in multi-domain Cloudflare accounts.
+* Added: Complete "Reset All Data" option beside Save Changes with confirmation prompt to wipe all credentials and cached transients back to a clean installation state.
+* Added: WordPress standard `uninstall.php` handler for zero leftover footprint upon plugin deletion.
+* Enhanced: GraphQL RUM query schema compatibility with exact Cloudflare enum ordering (`date_ASC`) and dimension typing.
 
 = 1.0.3 =
 * Enhanced: Dynamic 24-hour breakdown lists (Top Pages, Referrers, Locations) dynamically scaled to active pageviews.

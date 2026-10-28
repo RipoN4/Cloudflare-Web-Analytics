@@ -7,7 +7,7 @@
 <h1 align="center">Cloudflare Web Analytics for WordPress</h1>
 
 <p align="center">
-  <a href="https://github.com/RipoN4/Cloudflare-Web-Analytics/releases"><img src="https://img.shields.io/badge/Release-v1.0.0-orange.svg" alt="Release v1.0.0"></a>
+  <a href="https://github.com/RipoN4/Cloudflare-Web-Analytics/releases"><img src="https://img.shields.io/badge/Release-v1.1.0-orange.svg" alt="Release v1.1.0"></a>
   <a href="https://www.gnu.org/licenses/gpl-2.0.html"><img src="https://img.shields.io/badge/License-GPLv2-blue.svg" alt="License: GPL v2"></a>
   <a href="https://wordpress.org"><img src="https://img.shields.io/badge/WordPress-%3E%3D%205.8-21759b.svg" alt="WordPress: >= 5.8"></a>
   <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-%3E%3D%207.4-777bb4.svg" alt="PHP: >= 7.4"></a>

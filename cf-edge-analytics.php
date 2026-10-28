@@ -3,7 +3,7 @@
  * Plugin Name: Cloudflare Web Analytics
  * Plugin URI: https://github.com/RipoN4/Cloudflare-Web-Analytics
  * Description: Privacy-first, lightweight Cloudflare Web Analytics directly in your WordPress dashboard. 100% free, zero database bloat, no cookies, powered by Cloudflare GraphQL API.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: RipoN
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CF_ANALYTICS_VERSION', '1.0.0');
+define('CF_ANALYTICS_VERSION', '1.1.0');
 define('CF_ANALYTICS_PATH', plugin_dir_path(__FILE__));
 define('CF_ANALYTICS_URL', plugin_dir_url(__FILE__));
 define('CF_ANALYTICS_BASENAME', plugin_basename(__FILE__));
@@ -54,6 +54,9 @@ class CF_Edge_Analytics {
         add_action('wp_ajax_cf_analytics_refresh', [$this, 'ajax_refresh_cache']);
         add_action('admin_post_cf_analytics_refresh', [$this, 'post_refresh_cache']);
 
+        // Admin Post handler for complete plugin reset
+        add_action('admin_post_cf_analytics_reset', [$this, 'post_reset_plugin']);
+
         // Admin Bar Quick Traffic Counter
         add_action('admin_bar_menu', [$this, 'add_admin_bar_node'], 99);
         add_action('wp_head', [$this, 'admin_bar_css']);
@@ -62,8 +65,10 @@ class CF_Edge_Analytics {
         // CSV Export Handler
         add_action('admin_post_cf_analytics_export_csv', [$this, 'export_analytics_csv']);
 
-        // Auto-detection handlers
+        // Auto-detection and Property Picker handlers
         add_action('wp_ajax_cf_analytics_autodetect', [$this, 'ajax_autodetect_credentials']);
+        add_action('wp_ajax_cf_analytics_get_sites', [$this, 'ajax_get_account_sites']);
+        add_action('wp_ajax_cf_analytics_save_selected_site', [$this, 'ajax_save_selected_site']);
         add_action('update_option_cf_analytics_api_token', [$this, 'on_api_token_updated'], 10, 2);
 
         // Plugin Action Links
@@ -674,6 +679,111 @@ class CF_Edge_Analytics {
             'zone_tag'   => $detected['zone_tag'] ?? '',
             'host'       => $detected['host'] ?? '',
         ]);
+    }
+
+    /**
+     * AJAX Handler: Get all Web Analytics properties in account for modal selection
+     */
+    public function ajax_get_account_sites() {
+        check_ajax_referer('cf_analytics_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'cf-edge-analytics')], 403);
+        }
+
+        $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : '';
+        if (empty($token)) {
+            $token = get_option('cf_analytics_api_token', '');
+        }
+
+        if (empty($token)) {
+            wp_send_json_error(['message' => __('Please enter your Cloudflare API Token first.', 'cf-edge-analytics')], 400);
+        }
+
+        $result = $this->api->fetch_all_account_sites($token);
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(['message' => $result->get_error_message()], 400);
+        }
+
+        wp_send_json_success($result);
+    }
+
+    /**
+     * AJAX Handler: Save selected property from modal
+     */
+    public function ajax_save_selected_site() {
+        check_ajax_referer('cf_analytics_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => __('Unauthorized', 'cf-edge-analytics')], 403);
+        }
+
+        $site_tag   = isset($_POST['site_tag']) ? sanitize_text_field(wp_unslash($_POST['site_tag'])) : '';
+        $account_id = isset($_POST['account_id']) ? sanitize_text_field(wp_unslash($_POST['account_id'])) : '';
+        $zone_id    = isset($_POST['zone_id']) ? sanitize_text_field(wp_unslash($_POST['zone_id'])) : '';
+        $token      = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : '';
+        $domain     = isset($_POST['domain']) ? sanitize_text_field(wp_unslash($_POST['domain'])) : '';
+
+        if (empty($site_tag)) {
+            wp_send_json_error(['message' => __('Site Tag is required.', 'cf-edge-analytics')], 400);
+        }
+
+        if (!empty($token)) {
+            update_option('cf_analytics_api_token', $token);
+        }
+        if (!empty($account_id)) {
+            update_option('cf_analytics_account_id', $account_id);
+        }
+        update_option('cf_analytics_site_tag', $site_tag);
+        if (!empty($zone_id)) {
+            update_option('cf_analytics_zone_id', $zone_id);
+        }
+
+        $this->api->clear_all_caches();
+
+        wp_send_json_success([
+            'message'    => __('Site property selected and connected successfully!', 'cf-edge-analytics'),
+            'domain'     => $domain,
+            'site_tag'   => $site_tag,
+            'account_id' => $account_id,
+            'zone_id'    => $zone_id,
+        ]);
+    }
+
+    /**
+     * Handle Complete Plugin Reset
+     * Wipes all plugin options and transients so it returns to fresh installation state
+     */
+    public function post_reset_plugin() {
+        check_admin_referer('cf_analytics_reset_action', 'cf_reset_nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to reset this plugin.', 'cf-edge-analytics'));
+        }
+
+        // 1. Delete all plugin options
+        delete_option('cf_analytics_api_token');
+        delete_option('cf_analytics_account_id');
+        delete_option('cf_analytics_site_tag');
+        delete_option('cf_analytics_zone_id');
+        delete_option('cf_analytics_cache_ttl');
+        delete_option('cf_analytics_view_capability');
+        delete_option('cf_analytics_admin_bar_counter');
+
+        // 2. Clear all transient caches
+        $this->api->clear_all_caches();
+
+        // 3. Delete any orphaned transients from options table
+        global $wpdb;
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_cf_analytics_%' OR option_name LIKE '_transient_timeout_cf_analytics_%'");
+
+        // 4. Redirect with reset confirmation flag
+        wp_safe_redirect(add_query_arg([
+            'page'     => 'cf-edge-analytics-settings',
+            'cf_reset' => '1',
+        ], admin_url('options-general.php')));
+        exit;
     }
 
     /**

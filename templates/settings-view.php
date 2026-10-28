@@ -38,6 +38,16 @@ $admin_bar_counter = (int) get_option('cf_analytics_admin_bar_counter', 1);
         </div>
     </header>
 
+    <?php if (isset($_GET['cf_reset']) && $_GET['cf_reset'] == '1') : ?>
+        <div class="cf-notice-banner cf-notice-warning" style="border-left-color: #ef4444; background: rgba(239, 68, 68, 0.08);">
+            <span class="dashicons dashicons-trash cf-banner-icon" style="color: #ef4444;"></span>
+            <div class="cf-banner-content">
+                <strong style="color: #b91c1c;"><?php esc_html_e('Plugin Data Reset Successfully!', 'cf-edge-analytics'); ?></strong>
+                <span><?php esc_html_e('All Cloudflare API credentials, site tags, and cached analytics have been wiped. The plugin is back to its clean initial state.', 'cf-edge-analytics'); ?></span>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <?php if (isset($_GET['settings-updated']) && $_GET['settings-updated']) : ?>
         <div class="cf-notice-banner cf-notice-success">
             <span class="dashicons dashicons-yes-alt cf-banner-icon"></span>
@@ -85,10 +95,16 @@ $is_connected = !empty($api_token) && (!empty($site_tag) || !empty($account_id) 
                                 <span class="cf-status-indicator-dot"></span>
                                 <strong class="cf-conn-badge-title"><?php esc_html_e('Connected to Cloudflare Web Analytics', 'cf-edge-analytics'); ?></strong>
                             </div>
-                            <button type="button" class="button cf-btn-secondary-sm" id="cf-btn-toggle-token-edit">
-                                <span class="dashicons dashicons-edit"></span>
-                                <span id="cf-edit-token-label"><?php esc_html_e('Change Token', 'cf-edge-analytics'); ?></span>
-                            </button>
+                            <div class="cf-conn-header-actions" style="display: flex; gap: 8px; align-items: center;">
+                                <button type="button" class="button cf-btn-secondary-sm" id="cf-btn-switch-domain" title="<?php esc_attr_e('Select another domain or property from Cloudflare', 'cf-edge-analytics'); ?>">
+                                    <span class="dashicons dashicons-networking"></span>
+                                    <span><?php esc_html_e('Switch Domain', 'cf-edge-analytics'); ?></span>
+                                </button>
+                                <button type="button" class="button cf-btn-secondary-sm" id="cf-btn-toggle-token-edit">
+                                    <span class="dashicons dashicons-edit"></span>
+                                    <span id="cf-edit-token-label"><?php esc_html_e('Change Token', 'cf-edge-analytics'); ?></span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="cf-conn-metadata-grid">
@@ -281,11 +297,22 @@ $is_connected = !empty($api_token) && (!empty($site_tag) || !empty($account_id) 
                 <div class="cf-form-actions">
                     <?php submit_button(__('Save Changes', 'cf-edge-analytics'), 'button cf-btn cf-btn-submit', 'submit', false); ?>
 
+                    <button type="button" class="button cf-btn cf-btn-danger" id="cf-btn-reset-plugin">
+                        <span class="dashicons dashicons-trash cf-btn-icon"></span>
+                        <span><?php esc_html_e('Reset All Data', 'cf-edge-analytics'); ?></span>
+                    </button>
+
                     <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=cf_analytics_refresh'), 'cf_analytics_refresh_action')); ?>" class="button cf-btn cf-btn-refresh-manual">
                         <span class="dashicons dashicons-update cf-btn-icon"></span>
                         <span><?php esc_html_e('Flush Transient Cache', 'cf-edge-analytics'); ?></span>
                     </a>
                 </div>
+            </form>
+
+            <!-- Hidden Form for complete plugin reset -->
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" id="cf-reset-plugin-form" style="display:none;">
+                <?php wp_nonce_field('cf_analytics_reset_action', 'cf_reset_nonce'); ?>
+                <input type="hidden" name="action" value="cf_analytics_reset" />
             </form>
         </div>
 
@@ -410,7 +437,7 @@ $is_connected = !empty($api_token) && (!empty($site_tag) || !empty($account_id) 
     <!-- Plugin Footer / Credits -->
     <footer class="cf-card" style="margin-top: 24px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: var(--cf-card-bg); border: 1px solid var(--cf-border);">
         <div style="font-size: 13px; color: var(--cf-text-sub);">
-            <strong>Cloudflare Web Analytics</strong> &bull; v1.0.0 &bull; <?php esc_html_e('Crafted by', 'cf-edge-analytics'); ?> <a href="https://ripon.in" target="_blank" rel="noopener" style="color: var(--cf-blue); font-weight: 600; text-decoration: none;">RipoN</a>
+            <strong>Cloudflare Web Analytics</strong> &bull; v<?php echo esc_html(CF_ANALYTICS_VERSION); ?> &bull; <?php esc_html_e('Crafted by', 'cf-edge-analytics'); ?> <a href="https://ripon.in" target="_blank" rel="noopener" style="color: var(--cf-blue); font-weight: 600; text-decoration: none;">RipoN</a>
         </div>
         <div style="display: flex; gap: 14px; font-size: 12px;">
             <a href="https://github.com/RipoN4/Cloudflare-Web-Analytics" target="_blank" rel="noopener" style="color: var(--cf-text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
@@ -418,4 +445,54 @@ $is_connected = !empty($api_token) && (!empty($site_tag) || !empty($account_id) 
             </a>
         </div>
     </footer>
+
+    <!-- Interactive Property Picker Modal -->
+    <div class="cf-modal-overlay" id="cf-site-picker-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="cf-modal-title">
+        <div class="cf-modal-backdrop" id="cf-modal-backdrop"></div>
+        <div class="cf-modal-dialog">
+            <div class="cf-modal-header">
+                <div class="cf-modal-header-title">
+                    <span class="dashicons dashicons-networking cf-modal-header-icon"></span>
+                    <div>
+                        <h3 id="cf-modal-title" class="cf-modal-title"><?php esc_html_e('Select Cloudflare Site Property', 'cf-edge-analytics'); ?></h3>
+                        <p class="cf-modal-subtitle"><?php esc_html_e('Choose which website property in your Cloudflare account to stream analytics for', 'cf-edge-analytics'); ?></p>
+                    </div>
+                </div>
+                <button type="button" class="cf-modal-close" id="cf-modal-close-btn" aria-label="<?php esc_attr_e('Close modal', 'cf-edge-analytics'); ?>">&times;</button>
+            </div>
+
+            <div class="cf-modal-body">
+                <!-- Search filter bar -->
+                <div class="cf-modal-search-wrap">
+                    <input type="search" id="cf-modal-search-input" class="cf-modal-search-input" placeholder="<?php esc_attr_e('Search by domain name, site tag, or zone...', 'cf-edge-analytics'); ?>" autocomplete="off" />
+                </div>
+
+                <!-- Status alert container in modal -->
+                <div class="cf-modal-status" id="cf-modal-status" style="display:none;"></div>
+
+                <!-- Sites list container -->
+                <div class="cf-modal-sites-container" id="cf-modal-sites-list">
+                    <div class="cf-modal-loading">
+                        <span class="cf-spinner"></span>
+                        <p><?php esc_html_e('Fetching Web Analytics properties from your Cloudflare account...', 'cf-edge-analytics'); ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cf-modal-footer">
+                <div class="cf-modal-footer-info">
+                    <span id="cf-modal-sites-count" class="cf-modal-sites-count">0 properties available</span>
+                </div>
+                <div class="cf-modal-footer-actions">
+                    <button type="button" class="button cf-btn-secondary" id="cf-modal-cancel-btn">
+                        <?php esc_html_e('Cancel', 'cf-edge-analytics'); ?>
+                    </button>
+                    <button type="button" class="button cf-btn cf-btn-submit" id="cf-modal-confirm-btn" disabled>
+                        <span class="dashicons dashicons-yes cf-btn-icon"></span>
+                        <span><?php esc_html_e('Connect Selected Site', 'cf-edge-analytics'); ?></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
