@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Cloudflare Web Analytics
+ * Plugin Name: Web Analytics for Cloudflare
  * Plugin URI: https://github.com/RipoN4/Cloudflare-Web-Analytics
  * Description: Privacy-first, lightweight Cloudflare Web Analytics directly in your WordPress dashboard. 100% free, zero database bloat, no cookies, powered by Cloudflare GraphQL API.
  * Version: 1.1.0

@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center">Cloudflare Web Analytics for WordPress</h1>
+<h1 align="center">Web Analytics for Cloudflare</h1>
 
 <p align="center">
   <a href="https://github.com/RipoN4/Cloudflare-Web-Analytics/releases"><img src="https://img.shields.io/badge/Release-v1.1.0-orange.svg" alt="Release v1.1.0"></a>

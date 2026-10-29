@@ -1,4 +1,4 @@
-=== Cloudflare Web Analytics ===
+=== Web Analytics for Cloudflare ===
 Contributors: ripon4
 Donate link: https://ripon.in
 Tags: cloudflare, analytics, web analytics, pageviews, privacy, visitors, traffic
@@ -9,7 +9,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Lightweight, privacy-first Cloudflare Web Analytics for WordPress. Zero database bloat, no cookies, 100% free edge analytics in your dashboard.
+Lightweight, privacy-first Web Analytics for Cloudflare on WordPress. Zero database bloat, no cookies, 100% free edge analytics in your dashboard.
 
 == Description ==
 
@@ -19,7 +19,7 @@ In the past, website owners relied on Jetpack for basic traffic statistics, but 
 
 Cloudflare offers an enterprise-grade, privacy-first **Web Analytics (RUM)** engine that is 100% free with unlimited sites. However, checking it previously required logging into the Cloudflare dashboard manually every day.
 
-**Cloudflare Web Analytics for WordPress** solves this by connecting directly to Cloudflare's GraphQL API to stream pure human pageviews, visits, referrers, and locations straight to your WordPress dashboard.
+**Web Analytics for Cloudflare** solves this by connecting directly to Cloudflare's GraphQL API to stream pure human pageviews, visits, referrers, and locations straight to your WordPress dashboard.
 
 ### Key Benefits
 
